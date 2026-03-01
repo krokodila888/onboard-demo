@@ -1,0 +1,534 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Shepherd.js custom theme (emerald palette) ──────────────────────────── */
+
+/* Tooltip container */
+.shepherd-element.shp-custom {
+  max-width: 380px;
+  border-radius: 14px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22), 0 4px 16px rgba(0, 0, 0, 0.12);
+  border: none;
+  overflow: hidden;
+  font-family: inherit;
+}
+
+/* Arrow */
+.shepherd-element.shp-custom .shepherd-arrow::before {
+  background: #064e3b;
+}
+
+/* Header */
+.shepherd-element.shp-custom.shepherd-has-title .shepherd-content .shepherd-header {
+  background: #064e3b;
+  padding: 12px 16px;
+  border-radius: 0;
+}
+.shepherd-element.shp-custom .shepherd-title {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+}
+.shepherd-element.shp-custom .shepherd-cancel-icon {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 18px;
+}
+.shepherd-element.shp-custom .shepherd-cancel-icon:hover {
+  color: #ffffff;
+}
+
+/* Body text */
+.shepherd-element.shp-custom .shepherd-text {
+  background: #ffffff;
+  color: #374151;
+  font-size: 13.5px;
+  line-height: 1.65;
+  padding: 14px 16px 10px;
+}
+.shepherd-element.shp-custom .shepherd-text p {
+  margin: 0 0 8px;
+}
+.shepherd-element.shp-custom .shepherd-text p:last-child {
+  margin-bottom: 0;
+}
+.shepherd-element.shp-custom .shepherd-text strong {
+  color: #065f46;
+}
+.shepherd-element.shp-custom .shepherd-text em {
+  font-family: monospace;
+  font-size: 12.5px;
+  background: #ecfdf5;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-style: normal;
+}
+
+/* Progress bar (injected by injectProgress) */
+.shepherd-element.shp-custom .shp-progress {
+  padding: 0 16px 4px;
+  background: #ffffff;
+}
+.shepherd-element.shp-custom .shp-progress__track {
+  height: 4px;
+  background: #d1fae5;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.shepherd-element.shp-custom .shp-progress__fill {
+  height: 100%;
+  background: #059669;
+  border-radius: 2px;
+  transition: width 0.35s ease;
+}
+.shepherd-element.shp-custom .shp-progress__label {
+  display: block;
+  font-size: 11px;
+  color: #9ca3af;
+  text-align: right;
+}
+
+/* Footer / buttons */
+.shepherd-element.shp-custom .shepherd-footer {
+  background: #f9fafb;
+  padding: 10px 12px;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+/* Primary button */
+.shepherd-element.shp-custom .shepherd-button {
+  background: #059669;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  font-family: inherit;
+}
+.shepherd-element.shp-custom .shepherd-button:hover {
+  background: #047857;
+}
+.shepherd-element.shp-custom .shepherd-button:active {
+  transform: scale(0.97);
+}
+
+/* Secondary buttons (Назад, Пропустить) */
+.shepherd-element.shp-custom .shepherd-button.shepherd-button-secondary {
+  background: transparent;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+}
+.shepherd-element.shp-custom .shepherd-button.shepherd-button-secondary:hover {
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+/* Modal overlay */
+.shepherd-modal-overlay-container {
+  opacity: 1 !important;
+}
+
+/* Tab bar horizontal scroll hide scrollbar */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─── Intro.js custom theme (blue palette) ────────────────────────────────── */
+
+/* Overlay */
+.introjs-overlay {
+  background: rgba(0, 0, 0, 0.65) !important;
+}
+
+/* Helper / highlight layer */
+.introjs-helperLayer {
+  border-radius: 10px !important;
+  box-shadow:
+    0 0 0 9999px rgba(0, 0, 0, 0.65),
+    0 0 0 3px #2563eb !important;
+}
+
+/* Tooltip */
+.introjs-tooltip.introjs-custom {
+  font-family: inherit;
+  border-radius: 14px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: none;
+  min-width: 300px;
+  max-width: 380px;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Tooltip header (title) */
+.introjs-tooltip.introjs-custom .introjs-tooltip-title {
+  background: #1d4ed8;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  padding: 12px 40px 12px 16px;
+  border-bottom: none;
+}
+
+/* Close (×) button */
+.introjs-tooltip.introjs-custom .introjs-skipbutton {
+  color: rgba(255, 255, 255, 0.8);
+  top: 10px;
+  right: 12px;
+  font-size: 18px;
+  line-height: 1;
+}
+.introjs-tooltip.introjs-custom .introjs-skipbutton:hover {
+  color: #ffffff;
+}
+
+/* Tooltip body text */
+.introjs-tooltip.introjs-custom .introjs-tooltiptext {
+  padding: 14px 16px 10px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #374151;
+}
+.introjs-tooltip.introjs-custom .introjs-tooltiptext p {
+  margin: 0 0 8px;
+}
+.introjs-tooltip.introjs-custom .introjs-tooltiptext p:last-child {
+  margin-bottom: 0;
+}
+.introjs-tooltip.introjs-custom .introjs-tooltiptext strong {
+  color: #1d4ed8;
+}
+
+/* Progress bar */
+.introjs-tooltip.introjs-custom .introjs-progress {
+  background: #dbeafe;
+  border-radius: 0;
+  height: 4px;
+  margin: 0;
+}
+.introjs-tooltip.introjs-custom .introjs-progressbar {
+  background: #2563eb;
+  border-radius: 0;
+  transition: width 0.35s ease;
+}
+
+/* Arrow */
+.introjs-tooltip.introjs-custom .introjs-arrow.top::after,
+.introjs-tooltip.introjs-custom .introjs-arrow.top-right::after,
+.introjs-tooltip.introjs-custom .introjs-arrow.top-middle::after {
+  border-bottom-color: #1d4ed8;
+}
+
+/* Footer */
+.introjs-tooltip.introjs-custom .introjs-tooltipbuttons {
+  background: #f9fafb;
+  border-top: 1px solid #f3f4f6;
+  padding: 10px 12px;
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+/* All buttons — reset browser defaults */
+.introjs-tooltip.introjs-custom .introjs-button {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  text-shadow: none;
+  line-height: 1.4;
+}
+
+/* Primary: Next / Done */
+.introjs-tooltip.introjs-custom .introjs-nextbutton,
+.introjs-tooltip.introjs-custom .introjs-donebutton {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+}
+.introjs-tooltip.introjs-custom .introjs-nextbutton:hover,
+.introjs-tooltip.introjs-custom .introjs-donebutton:hover {
+  background: #1d4ed8;
+}
+
+/* Secondary: Prev / Skip */
+.introjs-tooltip.introjs-custom .introjs-prevbutton,
+.introjs-tooltip.introjs-custom .introjs-skipbutton.introjs-fullbutton {
+  background: transparent;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+}
+.introjs-tooltip.introjs-custom .introjs-prevbutton:hover {
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db;
+}
+/* Disabled prev on first step */
+.introjs-tooltip.introjs-custom .introjs-prevbutton.introjs-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ─── Driver.js custom theme (violet palette) ─────────────────────────────── */
+
+/* Spotlight cutout border glow */
+#driver-highlighted-element-stage {
+  outline: 3px solid #7c3aed;
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+/* Popover wrapper */
+.driver-popover.drvr-custom {
+  font-family: inherit;
+  border-radius: 14px;
+  padding: 0;
+  overflow: hidden;
+  min-width: 300px;
+  max-width: 380px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+/* Accent bar injected by onPopoverRender */
+.driver-popover.drvr-custom .drvr-accent {
+  height: 4px;
+  background: linear-gradient(90deg, #7c3aed, #a78bfa);
+  width: 100%;
+}
+
+/* Title */
+.driver-popover.drvr-custom .driver-popover-title {
+  background: #4c1d95;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 36px 12px 16px;
+  margin: 0;
+  border-bottom: none;
+}
+
+/* Close × button */
+.driver-popover.drvr-custom .driver-popover-close-btn {
+  color: rgba(255, 255, 255, 0.75);
+  top: 10px;
+  right: 12px;
+  font-size: 20px;
+  line-height: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.driver-popover.drvr-custom .driver-popover-close-btn:hover {
+  color: #ffffff;
+}
+
+/* Description body */
+.driver-popover.drvr-custom .driver-popover-description {
+  padding: 14px 16px 10px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #374151;
+}
+.driver-popover.drvr-custom .driver-popover-description p {
+  margin: 0 0 8px;
+}
+.driver-popover.drvr-custom .driver-popover-description p:last-child {
+  margin-bottom: 0;
+}
+.driver-popover.drvr-custom .driver-popover-description strong {
+  color: #6d28d9;
+}
+
+/* Footer */
+.driver-popover.drvr-custom .driver-popover-footer {
+  background: #f9fafb;
+  border-top: 1px solid #f3f4f6;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Progress text */
+.driver-popover.drvr-custom .driver-popover-progress-text {
+  font-size: 11px;
+  color: #9ca3af;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Navigation buttons container */
+.driver-popover.drvr-custom .driver-popover-navigation-btns {
+  display: flex;
+  gap: 6px;
+}
+
+/* All nav buttons — base */
+.driver-popover.drvr-custom .driver-popover-navigation-btns button {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  border: none;
+  line-height: 1.4;
+}
+
+/* Primary: Next / Done */
+.driver-popover.drvr-custom #driver-popover-next-btn {
+  background: #7c3aed;
+  color: #ffffff;
+}
+.driver-popover.drvr-custom #driver-popover-next-btn:hover {
+  background: #6d28d9;
+}
+
+/* Secondary: Prev */
+.driver-popover.drvr-custom #driver-popover-prev-btn {
+  background: transparent;
+  color: #6b7280;
+  border: 1px solid #e5e7eb !important;
+}
+.driver-popover.drvr-custom #driver-popover-prev-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db !important;
+}
+
+/* Disabled */
+.driver-popover.drvr-custom .driver-popover-btn-disabled {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+}
+
+/* Arrow */
+.driver-popover.drvr-custom .driver-popover-arrow-side-left::after  { border-right-color:  #4c1d95 !important; }
+.driver-popover.drvr-custom .driver-popover-arrow-side-right::after { border-left-color:   #4c1d95 !important; }
+.driver-popover.drvr-custom .driver-popover-arrow-side-top::after   { border-bottom-color: #4c1d95 !important; }
+.driver-popover.drvr-custom .driver-popover-arrow-side-bottom::after{ border-top-color:    #4c1d95 !important; }
+
+/* ─── React Joyride custom theme (blue palette) ───────────────────────────── */
+
+/* Tooltip container */
+.__floater__body .__floater__content {
+  border-radius: 14px !important;
+}
+
+/* Beacon pulse ring */
+[data-id="beacon-inner"] {
+  background-color: #2563eb;
+}
+[data-id="beacon-outer"] {
+  border-color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.2);
+}
+
+/* Tooltip wrapper */
+.react-joyride__tooltip {
+  border-radius: 14px !important;
+  padding: 0 !important;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Header bar (title row) */
+.react-joyride__tooltip > div:first-child {
+  background: #1d4ed8;
+  padding: 12px 16px !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Title text */
+.react-joyride__tooltip h4 {
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+}
+
+/* Close × button in header */
+.react-joyride__tooltip button[data-action="close"] {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+.react-joyride__tooltip button[data-action="close"]:hover {
+  color: #ffffff !important;
+}
+
+/* Body / content area */
+.react-joyride__tooltip > div:nth-child(2) {
+  padding: 14px 16px 10px !important;
+}
+.react-joyride__tooltip p {
+  margin: 0 0 8px !important;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #374151;
+}
+.react-joyride__tooltip p:last-child {
+  margin-bottom: 0 !important;
+}
+.react-joyride__tooltip strong {
+  color: #1d4ed8;
+}
+
+/* Footer row with buttons */
+.react-joyride__tooltip > div:last-child {
+  background: #f9fafb !important;
+  border-top: 1px solid #f3f4f6 !important;
+  padding: 10px 12px !important;
+}
+
+/* All tooltip buttons — base */
+.react-joyride__tooltip button {
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  padding: 6px 14px !important;
+  transition: background 0.15s !important;
+}
+
+/* Primary: Next / Last */
+.react-joyride__tooltip button[data-action="primary"] {
+  background: #2563eb !important;
+  color: #ffffff !important;
+}
+.react-joyride__tooltip button[data-action="primary"]:hover {
+  background: #1d4ed8 !important;
+}
+
+/* Secondary: Back */
+.react-joyride__tooltip button[data-action="back"] {
+  background: transparent !important;
+  color: #6b7280 !important;
+  border: 1px solid #e5e7eb !important;
+}
+.react-joyride__tooltip button[data-action="back"]:hover {
+  background: #f3f4f6 !important;
+  color: #374151 !important;
+  border-color: #d1d5db !important;
+}
+
+/* Skip button */
+.react-joyride__tooltip button[data-action="skip"] {
+  background: transparent !important;
+  color: #9ca3af !important;
+  font-size: 12px !important;
+  padding: 4px 8px !important;
+}
+.react-joyride__tooltip button[data-action="skip"]:hover {
+  color: #6b7280 !important;
+}
