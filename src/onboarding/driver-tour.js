@@ -199,3 +199,74 @@ export function createDriverTour({ onDestroyed } = {}) {
 
   return { startTour, destroyTour }
 }
+
+// ─── Highlight factory ────────────────────────────────────────────────────────
+/**
+ * Returns `{ triggerHighlight, destroyHighlight }`.
+ * `triggerHighlight()` spotlights the Step-2 panel with a single-element
+ * highlight (not a full tour). A "Понятно" button closes it.
+ *
+ * @returns {{ triggerHighlight: () => void, destroyHighlight: () => void }}
+ */
+export function createDriverHighlight() {
+  let instance = null
+
+  function triggerHighlight() {
+    instance?.destroy()
+
+    // Capture in closure so the OK-button click can destroy it
+    let d
+
+    d = driver({
+      allowClose: true,
+      overlayOpacity: 0.45,
+      stagePadding: 10,
+      stageRadius: 12,
+      popoverClass: 'drvr-custom drvr-highlight',
+
+      onPopoverRender(popover) {
+        // Enable HTML in description
+        popover.description.innerHTML = `
+          <p>Теперь доступен расчёт тяговых характеристик.</p>
+          <p style="margin-top:6px">Введите уклон пути и нажмите <strong>«Рассчитать тяговые характеристики»</strong>.</p>
+        `
+        // Replace default footer with a single "Понятно" button
+        const footer = popover.wrapper.querySelector('.driver-popover-footer')
+        if (footer) {
+          footer.innerHTML = ''
+          const btn = document.createElement('button')
+          btn.id = 'driver-highlight-ok-btn'
+          btn.textContent = 'Понятно'
+          btn.addEventListener('click', () => d?.destroy())
+          footer.appendChild(btn)
+        }
+        // Remove close ×
+        const closeBtn = popover.wrapper.querySelector('.driver-popover-close-btn')
+        if (closeBtn) closeBtn.style.display = 'none'
+      },
+
+      onDestroyed() {
+        instance = null
+      },
+    })
+
+    instance = d
+
+    d.highlight({
+      element: '[data-onboarding-step="2"]',
+      popover: {
+        title: '✅ Шаг 1 выполнен!',
+        description: '',
+        side: 'top',
+        align: 'center',
+      },
+    })
+  }
+
+  function destroyHighlight() {
+    instance?.destroy()
+    instance = null
+  }
+
+  return { triggerHighlight, destroyHighlight }
+}

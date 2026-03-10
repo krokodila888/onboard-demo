@@ -133,6 +133,25 @@ function GoalSection() {
             ))}
           </ul>
         </div>
+
+        {/* Legacy tab */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 md:col-span-2">
+          <div className="flex items-center gap-2 mb-3">
+            <AlertCircle size={15} className="text-gray-500" />
+            <span className="text-sm font-semibold text-gray-800">Вкладка «Реальное ПО»</span>
+          </div>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            Специальная вкладка с <strong>намеренно ухудшенным интерфейсом</strong> — реконструкция
+            типичного устаревшего инженерного ПО без какого-либо онбординга. Содержит семь
+            UX-антипаттернов: невнятные аббревиатуры, бесполезные подсказки, молчаливая блокировка
+            кнопки, ложные сообщения об ошибках, скрытые зависимости полей и визуальный хаос.
+          </p>
+          <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+            Цель — создать контрольную точку отсчёта: показать, <em>насколько плохим</em> может
+            быть интерфейс без онбординга, чтобы тестируемые библиотеки оценивались не в вакууме,
+            а в сравнении с реальной проблемой.
+          </p>
+        </div>
       </div>
     </section>
   )
@@ -159,6 +178,11 @@ function FeaturesSection() {
             </BulletItem>
             <BulletItem>
               <strong>Упрощённые формулы</strong> по ПТР (Правилам тяговых расчётов) — для демонстрации интерфейса, не для реального проектирования
+            </BulletItem>
+          </ul>
+          <ul className="space-y-2 mb-3">
+            <BulletItem>
+              <strong>Намеренные UX-антипаттерны legacy-интерфейса (вкладка «Реальное ПО»)</strong> — невнятные аббревиатуры, бесполезные тултипы, молчаливая блокировка кнопки, ложные ошибки, скрытые зависимости полей — создают эталонный «плохой интерфейс» для сравнения
             </BulletItem>
           </ul>
           <Callout color="amber" icon={Info}>
@@ -264,7 +288,7 @@ function FeaturesSection() {
               <strong>График тяговой характеристики F(v)</strong> — зависимость силы тяги и суммарного сопротивления от скорости, с отображением равновесной скорости
             </BulletItem>
             <BulletItem>
-              Строится в реальном времени по результатам Шага 2 — отображает как <em>располагаемую</em> тягу, так и <em>потребную</em>
+              Строится в реальном времени по результатам Шага 2
             </BulletItem>
             <BulletItem>
               Реализован на <strong>SVG</strong> — типичный подход для технических графиков в веб-приложениях, без внешних зависимостей
@@ -288,10 +312,11 @@ const LIBRARIES = [
     name: 'Intro.js',
     version: 'v8.3',
     color: 'amber',
-    tags: ['Highlight', 'data-атрибуты', 'Зрелая'],
+    tags: ['Highlight', 'data-атрибуты'],
     desc: 'Классическая библиотека 2013 года. Выделяет элементы overlay-слоем с подсказкой. Минимальная настройка через data-атрибуты.',
     strengths: ['Простой старт', 'Широкая документация'],
     weaknesses: ['Слабая поддержка React', 'Базовое позиционирование'],
+    components: ['Онбординг-тур', 'Hints (постоянные маркеры)'],
   },
   {
     name: 'Shepherd.js',
@@ -301,6 +326,7 @@ const LIBRARIES = [
     desc: 'Мощная и гибкая библиотека с Floating UI под капотом. Поддерживает сложные сценарии и кастомный рендеринг шагов.',
     strengths: ['Точное позиционирование', 'Богатый Events API'],
     weaknesses: ['Больше кода для настройки', 'Тяжелее бандл'],
+    components: ['Онбординг-тур', 'Модальные шаги без привязки'],
   },
   {
     name: 'Driver.js',
@@ -310,6 +336,7 @@ const LIBRARIES = [
     desc: 'Современная лёгкая библиотека. Spotlight-эффект с затемнением фона чётко выделяет целевые элементы. Минималистичный API.',
     strengths: ['Spotlight-эффект', 'Нет зависимостей'],
     weaknesses: ['HTML в description — только через хук', 'Меньше возможностей кастомизации'],
+    components: ['Онбординг-тур', 'Одиночная подсветка (highlight)'],
   },
   {
     name: 'React Joyride',
@@ -319,10 +346,31 @@ const LIBRARIES = [
     desc: 'React-нативная библиотека. Управляется через state и props — идеально вписывается в React-архитектуру. Поддерживает TypeScript.',
     strengths: ['Нативный React state', 'Компонентная модель'],
     weaknesses: ['Только для React', 'Требует useState'],
+    components: ['Онбординг-тур', 'Beacon-режим (справка по полям)'],
+  },
+  {
+    name: 'Tippy.js',
+    version: 'v6.3',
+    color: 'orange',
+    tags: ['Tooltip', 'Popover', 'Hover/Click', 'Popper-based'],
+    desc: 'Специализированная библиотека тултипов и поповеров. Не предназначена для туров — фокус на контекстной справке по отдельным элементам. Используется в Bootstrap 5, Material-UI.',
+    strengths: ['Лёгкая интеграция', 'Богатые триггеры и анимации'],
+    weaknesses: ['Не для туров', 'Требует ручной организации сценариев'],
+    components: ['Контекстные тултипы (hover/focus)', 'Интерактивный поповер (click)'],
+  },
+  {
+    name: 'Floating UI',
+    version: 'v0.27',
+    color: 'purple',
+    tags: ['Движок', 'Позиционирование', 'Low-level', 'Без UI'],
+    desc: 'Низкоуровневый движок позиционирования. Не UI-библиотека — используется как основа для кастомных компонентов и других библиотек (Shepherd.js, Radix UI, MUI). Прямой аналог Popper.js, но современнее.',
+    strengths: ['Максимальная гибкость', 'Точное позиционирование', 'Tree-shakeable'],
+    weaknesses: ['Требует написания UI с нуля', 'Выше порог входа'],
+    components: ['Кастомный CustomTooltip (исходный код в src/)', 'Portal-рендеринг (FloatingPortal)'],
   },
 ]
 
-const TAG_COLORS = { amber: 'amber', emerald: 'emerald', violet: 'violet', blue: 'blue' }
+const TAG_COLORS = { amber: 'amber', emerald: 'emerald', violet: 'violet', blue: 'blue', orange: 'amber', purple: 'violet' }
 
 function LibrariesSection() {
   return (
@@ -344,6 +392,19 @@ function LibrariesSection() {
               </div>
             </div>
             <p className="text-xs text-gray-600 leading-relaxed mb-3">{lib.desc}</p>
+            {lib.components && (
+              <div className="mb-3">
+                <p className="text-[10px] font-semibold text-blue-600 uppercase tracking-wide mb-1">Реализованные компоненты</p>
+                <div className="flex flex-wrap gap-1">
+                  {lib.components.map(c => (
+                    <span key={c} className="flex items-center gap-0.5 text-[11px] text-gray-700">
+                      <CheckCircle2 size={10} className="text-blue-400 shrink-0" />
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <p className="text-[10px] font-semibold text-green-600 uppercase tracking-wide mb-1">Плюсы</p>
@@ -378,19 +439,19 @@ const CRITERIA_ROWS = [
     name: 'Простота интеграции',
     scale: '1–5',
     desc: 'Сколько кода потребовалось? Понятна ли документация? Нужны ли обёртки?',
-    scores: { introjs: 4, shepherd: 3, driver: 4, joyride: 4 },
+    scores: { introjs: 4, shepherd: 3, driver: 4, joyride: 4, tippy: 5, floating: 2 },
   },
   {
     name: 'Качество позиционирования',
     scale: '1–5',
     desc: 'Корректно ли работает auto-flip? Работает ли со скроллом и viewport?',
-    scores: { introjs: 3, shepherd: 5, driver: 4, joyride: 4 },
+    scores: { introjs: 3, shepherd: 5, driver: 4, joyride: 4, tippy: 4, floating: 5 },
   },
   {
     name: 'Поддержка многошаговых процессов',
     scale: '1–5',
     desc: 'Можно ли создать условные переходы? Работают ли disabled-элементы как цели?',
-    scores: { introjs: 2, shepherd: 4, driver: 3, joyride: 5 },
+    scores: { introjs: 2, shepherd: 4, driver: 3, joyride: 5, tippy: 1, floating: 3 },
   },
   {
     name: 'Работа с нестандартными элементами',
@@ -398,26 +459,26 @@ const CRITERIA_ROWS = [
     desc: (
       <>SVG-графики, <Code>&lt;select&gt;</Code>, раскрывающиеся секции</>
     ),
-    scores: { introjs: 2, shepherd: 4, driver: 4, joyride: 4 },
+    scores: { introjs: 2, shepherd: 4, driver: 4, joyride: 4, tippy: 4, floating: 5 },
   },
   {
     name: 'Размер bundle',
     scale: 'кБ (min)',
     desc: 'Реальный размер после сборки без gzip-сжатия',
-    scores: { introjs: '≈ 70 кБ', shepherd: '≈ 200 кБ', driver: '≈ 14 кБ', joyride: '≈ 65 кБ' },
+    scores: { introjs: '≈ 70 кБ', shepherd: '≈ 200 кБ', driver: '≈ 14 кБ', joyride: '≈ 65 кБ', tippy: '≈ 15 кБ', floating: '≈ 12 кБ' },
     isText: true,
   },
   {
     name: 'Документация',
     scale: '1–5',
     desc: 'Полнота, актуальность, наличие примеров для React',
-    scores: { introjs: 4, shepherd: 4, driver: 5, joyride: 4 },
+    scores: { introjs: 4, shepherd: 4, driver: 5, joyride: 4, tippy: 4, floating: 5 },
   },
   {
     name: 'Пригодность для расчётного ПО',
     scale: '1–5',
     desc: 'Общая оценка применимости к инженерным расчётным интерфейсам',
-    scores: { introjs: 3, shepherd: 4, driver: 4, joyride: 5 },
+    scores: { introjs: 3, shepherd: 4, driver: 4, joyride: 5, tippy: 3, floating: 4 },
   },
 ]
 
@@ -426,6 +487,8 @@ const LIB_COLS = [
   { key: 'shepherd',  label: 'Shepherd',   color: 'text-emerald-600' },
   { key: 'driver',    label: 'Driver.js',  color: 'text-violet-600'  },
   { key: 'joyride',   label: 'Joyride',    color: 'text-blue-600'    },
+  { key: 'tippy',     label: 'Tippy.js',   color: 'text-orange-600'  },
+  { key: 'floating',  label: 'Float. UI',  color: 'text-purple-600'  },
 ]
 
 function CriteriaSection() {
@@ -510,20 +573,40 @@ function CriteriaSection() {
 
 const TESTING_STEPS = [
   {
+    n: 0,
+    title: '(Рекомендуется) Начните с вкладки «Реальное ПО»',
+    desc: (
+      <>
+        Откройте вкладку <strong>«Реальное ПО»</strong> и попробуйте выполнить расчёт
+        самостоятельно. Затем нажмите <Code>Показать разбор проблем</Code>, чтобы увидеть,
+        какие UX-антипаттерны были намеренно встроены в интерфейс. Это создаст точку отсчёта:
+        насколько лучше работают тестируемые библиотеки онбординга по сравнению с отсутствием
+        какой-либо помощи пользователю.
+      </>
+    ),
+    sub: null,
+  },
+  {
     n: 1,
-    title: 'Выберите таб с библиотекой',
+    title: 'Выбрать таб с библиотекой',
     desc: 'Переключайтесь между «Intro.js», «Shepherd.js», «Driver.js» и «React Joyride» в шапке страницы.',
     sub: null,
   },
   {
     n: 2,
-    title: 'Нажмите «Запустить тур» в информационном баннере',
+    title: 'Нажать «Запустить тур» в информационном баннере',
     desc: 'Кнопка расположена в правой части цветного баннера под панелью вкладок.',
     sub: null,
   },
   {
     n: 3,
-    title: 'Пройдите весь тур, обращая внимание на:',
+    title: 'Изучить дополнительный компонент библиотеки',
+    desc: 'Нажмите вторую кнопку в баннере вкладки (рядом с «Запустить тур»). Каждая библиотека демонстрирует возможности, выходящие за рамки стандартного тура: Hints, модальные шаги, одиночная подсветка или Beacon-режим.',
+    sub: null,
+  },
+  {
+    n: 4,
+    title: 'Пройти весь тур, обращая внимание на:',
     desc: null,
     sub: [
       'Корректность позиционирования tooltip относительно целевого элемента',
@@ -533,8 +616,8 @@ const TESTING_STEPS = [
     ],
   },
   {
-    n: 4,
-    title: 'Попробуйте выполнить расчёт под руководством тура',
+    n: 5,
+    title: 'Попробовать выполнить расчёт под руководством тура',
     desc: (
       <>
         Заполните Шаг 1 (выбор локомотива + масса состава) прямо во время тура.
@@ -544,8 +627,8 @@ const TESTING_STEPS = [
     sub: null,
   },
   {
-    n: 5,
-    title: 'Откройте раскрывающиеся секции — как библиотека реагирует?',
+    n: 6,
+    title: 'Открыть раскрывающиеся секции — как библиотека реагирует?',
     desc: (
       <>
         Раскройте <Code>Расширенные физические параметры</Code> в Шаге 2.
@@ -555,14 +638,14 @@ const TESTING_STEPS = [
     sub: null,
   },
   {
-    n: 6,
-    title: 'Заполните секцию «Заметки для сравнения» внизу страницы',
+    n: 7,
+    title: 'Заполнить секцию «Заметки для сравнения» внизу страницы',
     desc: 'Карточки с оценками отображаются под калькулятором для каждой библиотеки (кроме «Без онбординга»).',
     sub: null,
   },
   {
-    n: 7,
-    title: 'Зафиксируйте проблемы и находки',
+    n: 8,
+    title: 'Зафиксировать проблемы и находки',
     desc: 'Обратитесь к секции «Типичные проблемы» на этой странице — она поможет структурировать наблюдения.',
     sub: null,
   },
@@ -578,8 +661,8 @@ function TestingProcessSection() {
           {TESTING_STEPS.map(s => (
             <div key={s.n} className="flex items-start gap-4">
               {/* Step number */}
-              <div className="w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                {s.n}
+              <div className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${s.n === 0 ? 'bg-gray-400 text-white' : 'bg-blue-600 text-white'}`}>
+                {s.n === 0 ? '★' : s.n}
               </div>
 
               <div className="flex-1 min-w-0">
@@ -666,6 +749,14 @@ const PROBLEMS = [
     title: 'Тур ломается при изменении DOM',
     desc: 'После раскрытия секции или появления новых элементов (график после расчёта) библиотека теряет позицию и не может скорректировать tooltip.',
   },
+  {
+    title: 'Tippy.js: отсутствие сценарной логики',
+    desc: 'Tippy.js не управляет последовательностью подсказок. Разработчик обязан самостоятельно реализовать любую логику порядка, условий показа и прогресса — библиотека лишь позиционирует поповер.',
+  },
+  {
+    title: 'Floating UI: весь UI — ответственность разработчика',
+    desc: 'Floating UI не предоставляет визуальных компонентов. Стили, анимации, кнопки навигации, оверлей, spotlight — всё реализуется вручную. Это мощно, но требует значительных трудозатрат.',
+  },
 ]
 
 function ProblemsSection() {
@@ -746,7 +837,7 @@ export default function AboutPage() {
       <GoalSection />
       <FeaturesSection />
       <LibrariesSection />
-      <CriteriaSection />
+      {/* <CriteriaSection /> */}
       <TestingProcessSection />
       <ProblemsSection />
     </div>

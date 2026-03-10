@@ -1,4 +1,5 @@
 // ─── React Joyride step definitions ──────────────────────────────────────────
+// joyride-steps.jsx — must stay .jsx because step content uses JSX
 // Each step targets an element by CSS selector (`target` field).
 // `content` supports JSX — passed through as React nodes in TractionCalculator.
 
@@ -114,5 +115,73 @@ export const JOYRIDE_STEPS = [
       </>
     ),
     disableBeacon: true,
+  },
+]
+
+// ─── Beacon-mode steps (Справка по полям) ────────────────────────────────────
+// Used in continuous={false} + disableOverlay={true} mode.
+// Beacons appear permanently; clicking opens a tooltip for that field only.
+export const JOYRIDE_BEACON_STEPS = [
+  {
+    target: '#step1-locomotive',
+    placement: 'right',
+    title: 'Тип локомотива',
+    content: (
+      <>
+        <p>Выберите серию электровоза или тепловоза.</p>
+        <p style={{ marginTop: 5 }}>
+          Тип определяет <strong>силу тяги</strong>, мощность и собственную массу,
+          которые участвуют в расчёте.
+        </p>
+        <p style={{ marginTop: 5, fontSize: 11, color: '#9ca3af' }}>
+          ВЛ80С: 520 кН · ВЛ85: 780 кН · ЧС2: 230 кН
+        </p>
+      </>
+    ),
+  },
+  {
+    target: '#step1-mass',
+    placement: 'right',
+    title: 'Масса состава, т',
+    content: (
+      <>
+        <p>Масса вагонов <strong>без локомотива</strong> в тоннах.</p>
+        <p style={{ marginTop: 5 }}>
+          Грузовые: <strong>1 000–9 000 т</strong> · Пассажирские: 600–1 200 т
+        </p>
+      </>
+    ),
+  },
+  {
+    target: '#step2-gradient',
+    placement: 'right',
+    title: 'Расчётный уклон, ‰',
+    content: (
+      <>
+        <p>Руководящий подъём в <strong>промилле (‰)</strong>.</p>
+        <p style={{ marginTop: 5 }}>
+          1 ‰ = подъём 1 м на 1 000 м пути.
+          Типовые значения: <strong>6–12 ‰</strong>.
+          «+» — подъём, «−» — спуск.
+        </p>
+      </>
+    ),
+  },
+  {
+    target: '#section-advanced',
+    placement: 'right',
+    title: 'Коэффициенты сопротивления',
+    content: (
+      <>
+        <p>
+          Параметры формулы ПТР:{' '}
+          <em>w₀ = a₀ + 3/v + a₂·v²</em>
+        </p>
+        <p style={{ marginTop: 5 }}>
+          <strong>a₀</strong> = коэф. качения (база 0.7 Н/кН)<br />
+          <strong>a₂</strong> = аэродинамика (0.0003)
+        </p>
+      </>
+    ),
   },
 ]

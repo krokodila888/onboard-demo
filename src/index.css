@@ -532,3 +532,81 @@
 .react-joyride__tooltip button[data-action="skip"]:hover {
   color: #6b7280 !important;
 }
+
+/* ─── Driver.js highlight (violet) — "Понятно" button ────────────────────── */
+.driver-popover.drvr-highlight #driver-highlight-ok-btn {
+  background: #7c3aed;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+  margin-left: auto;
+  display: block;
+}
+.driver-popover.drvr-highlight #driver-highlight-ok-btn:hover {
+  background: #6d28d9;
+}
+.driver-popover.drvr-highlight .driver-popover-footer {
+  justify-content: flex-end;
+}
+
+/* ─── Shepherd.js instruction tour (distinct accent) ─────────────────────── */
+.shepherd-element.shp-instruction .shepherd-header {
+  background: #1e3a5f !important;
+}
+.shepherd-element.shp-instruction .shepherd-arrow::before {
+  background: #1e3a5f !important;
+}
+.shepherd-element.shp-instruction .shepherd-text strong {
+  color: #1d4ed8 !important;
+}
+.shepherd-element.shp-instruction .shepherd-text ol {
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.8;
+}
+.shepherd-element.shp-instruction .shepherd-text ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ─── Intro.js hints bubble theme ────────────────────────────────────────── */
+.introjs-hint-bullet {
+  background: #2563eb !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4) !important;
+}
+.introjs-hint-dot {
+  background: rgba(37, 99, 235, 0.15) !important;
+  border-color: #2563eb !important;
+}
+.introjs-hintReference {
+  z-index: 9999 !important;
+}
+/* Hint tooltip */
+.introjs-tooltip.introjs-hint-tooltip {
+  font-family: inherit;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  max-width: 320px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.introjs-tooltip.introjs-hint-tooltip strong {
+  color: #1d4ed8;
+}
+.introjs-hintButtonLabel {
+  background: #2563eb !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 5px 14px !important;
+  font-size: 12px !important;
+  font-family: inherit !important;
+}

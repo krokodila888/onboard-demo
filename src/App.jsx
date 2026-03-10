@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect, lazy, Suspense } from 'react'
-import { Train, Play, Star, Info, BookOpen } from 'lucide-react'
+import { Train, Play, Star, Info, BookOpen, AlertTriangle } from 'lucide-react'
 import AdvancedTractionCalculator from './components/AdvancedTractionCalculator'
+import LegacyCalculator from './components/LegacyCalculator'
 import ErrorBoundary from './components/ErrorBoundary'
 
 const AboutPage = lazy(() => import('./pages/AboutPage'))
@@ -12,6 +13,16 @@ const TABS = [
     label: 'О проекте',
     hasTour: false,
     isAbout: true,
+    description: null,
+    tags: [],
+    ratings: null,
+    notes: null,
+  },
+  {
+    id: 'legacy',
+    label: 'Реальное ПО',
+    isLegacy: true,
+    hasTour: false,
     description: null,
     tags: [],
     ratings: null,
@@ -30,6 +41,9 @@ const TABS = [
     id: 'introjs',
     label: 'Intro.js',
     hasTour: true,
+    hasExtra: true,
+    extraLabel: 'Обновить Hints',
+    extraDesc: 'Постоянные подсказки «?» (Hints) на трёх технических полях — активны независимо от тура',
     description:
       'Классическая библиотека (2013) для создания пошаговых туров с выделением элементов. Настраивается через data-атрибуты или JavaScript API.',
     tags: ['Highlight', 'Progress bar', 'data-атрибуты', 'Зрелая'],
@@ -44,6 +58,9 @@ const TABS = [
     id: 'shepherd',
     label: 'Shepherd.js',
     hasTour: true,
+    hasExtra: true,
+    extraLabel: 'Инструкция по расчёту',
+    extraDesc: 'Модальный мини-тур из 3 шагов: вводный экран, типичные ошибки, точка старта',
     description:
       'Мощная и гибкая библиотека. Использует Floating UI для точного позиционирования tooltips. Поддерживает сложные сценарии с кастомными шагами.',
     tags: ['Floating UI', 'Кастомизация', 'Events API', 'Framework-agnostic'],
@@ -58,6 +75,9 @@ const TABS = [
     id: 'driver',
     label: 'Driver.js',
     hasTour: true,
+    hasExtra: true,
+    extraLabel: 'Одиночная подсветка',
+    extraDesc: 'driver.highlight() — подсвечивает следующий доступный шаг без запуска полного тура',
     description:
       'Современная легковесная библиотека (v2+). Spotlight-эффект с затемнением фона чётко выделяет целевые элементы. Минималистичный API.',
     tags: ['Spotlight', 'Современный API', 'Лёгкий', 'Без зависимостей'],
@@ -72,6 +92,9 @@ const TABS = [
     id: 'joyride',
     label: 'React Joyride',
     hasTour: true,
+    hasExtra: true,
+    extraLabel: 'Справка по полям',
+    extraDesc: 'Beacon-режим — пульсирующие маркеры на ключевых полях; клик открывает контекстную подсказку',
     description:
       'React-нативная библиотека. Управляется через state и props — идеально вписывается в React-архитектуру. Поддерживает TypeScript.',
     tags: ['React-нативный', 'State-driven', 'TypeScript', 'Popper.js'],
@@ -81,6 +104,38 @@ const TABS = [
       positioning: 'Popper.js — стабильное позиционирование в динамичных UI',
       suitability: 'Наилучший вариант для React-приложений с формами',
     },
+  },
+  {
+    id: 'tippy',
+    label: 'Tippy.js',
+    bannerTitle: 'Tippy.js — контекстная справка без тура',
+    hasTour: false,
+    description:
+      'В отличие от предыдущих вкладок, здесь нет пошагового тура. Tippy.js специализируется на тултипах и поповерах: справка доступна в любой момент по наведению или клику на значок ? рядом с полем. Это альтернативный подход к онбордингу — не "веди меня за руку", а "дай мне справку, когда она нужна".',
+    tags: ['Tooltip', 'Popover', 'Hover/Click', 'Popper-based'],
+    ratings: null,
+    notes: null,
+    components: [
+      'Контекстные тултипы на полях (hover/focus)',
+      'Интерактивный поповер с контентом (click)',
+      'Автоматическое перепозиционирование (flip)',
+    ],
+  },
+  {
+    id: 'custom',
+    label: 'Кастомная',
+    bannerTitle: 'Кастомная реализация на Floating UI',
+    hasTour: false,
+    description:
+      'Эта вкладка показывает, что находится "под капотом" у Shepherd.js и других библиотек. Floating UI — это движок позиционирования, на котором строятся тултипы, поповеры и туры. Здесь онбординг собран вручную: без готовой библиотеки, только @floating-ui/react и собственный код. Именно такой подход лежит в основе разрабатываемой в ВКР библиотеки.',
+    tags: ['Движок', 'Позиционирование', 'Low-level', 'Без UI'],
+    ratings: null,
+    notes: null,
+    components: [
+      'Кастомный компонент CustomTooltip (исходный код в src/)',
+      'Автоматический flip и shift через middleware',
+      'Portal-рендеринг (FloatingPortal)',
+    ],
   },
 ]
 
@@ -152,6 +207,39 @@ const PALETTE = {
     starFilled:  'text-gray-500 fill-gray-500',
     cardBorder:  'border-gray-200',
   },
+  legacy: {
+    tabActive:   'bg-gray-500 text-white shadow',
+    tabInactive: 'text-gray-500 hover:bg-gray-100',
+    bannerBg:    'bg-gray-50 border-gray-200',
+    titleColor:  'text-gray-900',
+    textColor:   'text-gray-700',
+    badge:       'bg-gray-100 text-gray-600',
+    tourBtn:     'bg-gray-500 hover:bg-gray-600 text-white',
+    starFilled:  'text-gray-400 fill-gray-400',
+    cardBorder:  'border-gray-200',
+  },
+  tippy: {
+    tabActive:   'bg-orange-500 text-white shadow',
+    tabInactive: 'text-orange-700 hover:bg-orange-50',
+    bannerBg:    'bg-orange-50 border-orange-200',
+    titleColor:  'text-orange-900',
+    textColor:   'text-orange-800',
+    badge:       'bg-orange-100 text-orange-700',
+    tourBtn:     'bg-orange-500 hover:bg-orange-600 text-white',
+    starFilled:  'text-orange-400 fill-orange-400',
+    cardBorder:  'border-orange-200',
+  },
+  custom: {
+    tabActive:   'bg-violet-600 text-white shadow',
+    tabInactive: 'text-violet-700 hover:bg-violet-50',
+    bannerBg:    'bg-violet-50 border-violet-200',
+    titleColor:  'text-violet-900',
+    textColor:   'text-violet-800',
+    badge:       'bg-violet-100 text-violet-700',
+    tourBtn:     'bg-violet-600 hover:bg-violet-700 text-white',
+    starFilled:  'text-violet-500 fill-violet-500',
+    cardBorder:  'border-violet-200',
+  },
 }
 
 // ─── StarRating ───────────────────────────────────────────────────────────────
@@ -181,7 +269,7 @@ function NoteCard({ criterion, rating, note, filledClass, borderClass }) {
 }
 
 // ─── LibraryBanner ────────────────────────────────────────────────────────────
-function LibraryBanner({ tab, palette, onStartTour }) {
+function LibraryBanner({ tab, palette, onStartTour, onStartExtra }) {
   return (
     <div className={`rounded-2xl border ${palette.bannerBg} p-4 sm:p-5`}>
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -189,11 +277,29 @@ function LibraryBanner({ tab, palette, onStartTour }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
             <Info size={15} className={palette.titleColor} />
-            <h2 className={`text-sm font-bold ${palette.titleColor}`}>{tab.label}</h2>
+            <h2 className={`text-sm font-bold ${palette.titleColor}`}>{tab.bannerTitle ?? tab.label}</h2>
           </div>
           <p className={`text-sm leading-relaxed ${palette.textColor} mb-3`}>
             {tab.description}
           </p>
+          {/* Extra component description */}
+          {tab.hasExtra && tab.extraDesc && (
+            <p className={`text-xs leading-relaxed ${palette.textColor} mb-3 opacity-80`}>
+              <BookOpen size={12} className="inline mr-1 mb-0.5" />
+              <strong>Доп. компонент:</strong> {tab.extraDesc}
+            </p>
+          )}
+          {/* Implemented components list (Tippy, Custom tabs) */}
+          {tab.components && tab.components.length > 0 && (
+            <ul className={`text-xs leading-relaxed ${palette.textColor} mb-3 space-y-0.5`}>
+              {tab.components.map((c) => (
+                <li key={c} className="flex items-center gap-1.5">
+                  <span className="text-green-500 font-bold">✓</span>
+                  {c}
+                </li>
+              ))}
+            </ul>
+          )}
           <div className="flex flex-wrap gap-1.5">
             {tab.tags.map((tag) => (
               <span key={tag} className={`px-2 py-0.5 rounded-full text-xs font-medium ${palette.badge}`}>
@@ -203,9 +309,9 @@ function LibraryBanner({ tab, palette, onStartTour }) {
           </div>
         </div>
 
-        {/* Right: Start tour button */}
+        {/* Right: buttons */}
         {tab.hasTour && (
-          <div className="shrink-0">
+          <div className="shrink-0 flex flex-col gap-2">
             <button
               type="button"
               onClick={onStartTour}
@@ -214,6 +320,16 @@ function LibraryBanner({ tab, palette, onStartTour }) {
               <Play size={14} className="fill-current" />
               Запустить тур
             </button>
+            {tab.hasExtra && tab.extraLabel && (
+              <button
+                type="button"
+                onClick={onStartExtra}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-colors border ${palette.badge} border-current opacity-80 hover:opacity-100`}
+              >
+                <BookOpen size={13} />
+                {tab.extraLabel}
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -270,10 +386,11 @@ function ComparisonNotes({ tab, palette }) {
 
 // ─── App ──────────────────────────────────────────────────────────────────────
 export default function App() {
-  const [activeId, setActiveId] = useState('baseline')
+  const [activeId, setActiveId] = useState('about')
 
-  // Shared ref populated by the active AdvancedTractionCalculator instance
-  const tourRef = useRef(null)
+  // Shared refs populated by the active AdvancedTractionCalculator instance
+  const tourRef        = useRef(null)
+  const extraActionRef = useRef(null)
 
   const activeTab     = TABS.find((t) => t.id === activeId)
   const activePalette = PALETTE[activeId]
@@ -285,6 +402,12 @@ export default function App() {
       alert(`Тур «${activeTab.label}» будет реализован на следующем этапе.`)
     }
   }, [activeTab])
+
+  const handleStartExtra = useCallback(() => {
+    if (extraActionRef.current?.start) {
+      extraActionRef.current.start()
+    }
+  }, [])
 
   // Ctrl+T keyboard shortcut to start tour
   useEffect(() => {
@@ -339,9 +462,10 @@ export default function App() {
                     }`}
                   >
                     {tab.isAbout && <BookOpen size={13} />}
+                    {tab.isLegacy && <AlertTriangle size={13} />}
                     {tab.label}
                   </button>
-                  {tab.isAbout && (
+                  {(tab.isAbout || tab.isLegacy) && (
                     <div className="w-px h-5 bg-gray-200 self-center ml-2 shrink-0" />
                   )}
                 </div>
@@ -365,6 +489,9 @@ export default function App() {
               <AboutPage />
             </Suspense>
           </ErrorBoundary>
+        ) : activeTab.isLegacy ? (
+          /* ── Legacy tab ── */
+          <LegacyCalculator key="legacy" />
         ) : (
           /* ── Calculator tabs ── */
           <>
@@ -374,11 +501,12 @@ export default function App() {
                 tab={activeTab}
                 palette={activePalette}
                 onStartTour={handleStartTour}
+                onStartExtra={handleStartExtra}
               />
             </div>
 
             {/* Calculator — re-mounts on tab switch to reset form + tour state */}
-            <AdvancedTractionCalculator key={activeId} onboardingLib={activeId} tourRef={tourRef} />
+            <AdvancedTractionCalculator key={activeId} onboardingLib={activeId} tourRef={tourRef} extraActionRef={extraActionRef} />
 
             {/* Comparison notes (hidden for baseline) */}
             <ComparisonNotes tab={activeTab} palette={activePalette} />

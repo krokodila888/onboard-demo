@@ -191,3 +191,36 @@ export function getIntrojsProgress() {
     return null
   }
 }
+
+// ─── Hints factory ────────────────────────────────────────────────────────────
+/**
+ * Initialise Intro.js Hints on 3 technical fields of the calculator.
+ * Returns the introJs instance so the caller can call .showHints() /
+ * .hideHints() / .removeHints() as needed.
+ */
+export function createIntrojsHints() {
+  const hints = [
+    {
+      element: document.querySelector('#step1-mass'),
+      hint: '<strong>Масса состава</strong><br>Масса вагонов <em>без локомотива</em> в тоннах.<br>Грузовые поезда: 1 000–9 000 т, пассажирские: 600–1 200 т.',
+      hintPosition: 'top-right',
+    },
+    {
+      element: document.querySelector('#step2-gradient'),
+      hint: '<strong>Уклон (промилле, ‰)</strong><br>1 ‰ = подъём 1 м на 1 000 м пути.<br>Расчётные уклоны: 6–12 ‰. «+» — подъём, «−» — спуск.',
+      hintPosition: 'top-right',
+    },
+    {
+      element: document.querySelector('#section-advanced'),
+      hint: '<strong>Коэффициенты ПТР</strong><br>Формула: w₀ = a₀ + 3/v + a₂·v²<br><em>a₀</em> = коэф. качения (норм. 0.7 Н/кН)<br><em>a₂</em> = аэродинамический коэф. (0.0003)',
+      hintPosition: 'top-right',
+    },
+  ].filter(h => h.element !== null)
+
+  // Intro.js v8: use introJs.hint() — introJs() is deprecated for hints
+  const instance = introJs.hint()
+  instance.setOptions({ hints, hintButtonLabel: 'Понятно' })
+  // addHints() both adds and shows hint bubbles in v8 (showHints() was removed)
+  instance.addHints()
+  return instance
+}

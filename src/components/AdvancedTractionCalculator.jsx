@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef, memo } from 'react'
 import Joyride, { STATUS } from 'react-joyride'
-import { createShepherdTour } from '../onboarding/shepherd-tour'
-import { createIntrojsTour }  from '../onboarding/introjs-tour'
-import { createDriverTour }   from '../onboarding/driver-tour'
-import { JOYRIDE_STEPS }      from '../onboarding/joyride-steps.jsx'
+import { createShepherdTour, createShepherdInstructionTour } from '../onboarding/shepherd-tour'
+import { createIntrojsTour, createIntrojsHints }            from '../onboarding/introjs-tour'
+import { createDriverTour, createDriverHighlight }          from '../onboarding/driver-tour'
+import { JOYRIDE_STEPS, JOYRIDE_BEACON_STEPS }              from '../onboarding/joyride-steps.jsx'
 import Shepherd from 'shepherd.js'
+import Tippy from '@tippyjs/react'
+import 'tippy.js/dist/tippy.css'
+import CustomTooltip from './CustomTooltip'
 import {
   HelpCircle, Calculator, CheckCircle2, ChevronDown, ChevronRight,
   Lock, Zap, Weight, Train, BarChart2, TrendingUp, DollarSign,
@@ -163,6 +166,37 @@ function InfoBadge({ text }) {
   )
 }
 
+// ─── TippyBadge — «?» icon with Tippy.js tooltip ─────────────────────────────
+function TippyBadge({ content }) {
+  return (
+    <Tippy content={content} placement="right" trigger="mouseenter focus" animation="scale" maxWidth={260}>
+      <span
+        role="img"
+        aria-label="Подсказка"
+        className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-orange-100 text-orange-600 text-[10px] font-bold cursor-help ml-1 align-middle"
+      >
+        ?
+      </span>
+    </Tippy>
+  )
+}
+
+// ─── CustomBadge — «?» icon with Floating UI CustomTooltip ───────────────────
+function CustomBadge({ content }) {
+  return (
+    <CustomTooltip content={content} placement="right">
+      <span
+        role="img"
+        aria-label="Подсказка"
+        className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-violet-100 text-violet-600 text-[10px] font-bold cursor-help ml-1 align-middle"
+        tabIndex={0}
+      >
+        ?
+      </span>
+    </CustomTooltip>
+  )
+}
+
 // ─── SpecChip ─────────────────────────────────────────────────────────────────
 function SpecChip({ id, icon, label, value }) {
   return (
@@ -209,7 +243,7 @@ function SummaryCard({ label, value, note, icon, color = 'blue' }) {
 
 // ─── CollapsibleSection ───────────────────────────────────────────────────────
 function CollapsibleSection({
-  id, title, infoBadgeText, defaultOpen = false,
+  id, title, infoBadgeText, infoBadgeNode, defaultOpen = false,
   hasCheckbox, checkboxLabel, checked, onCheckedChange,
   children,
 }) {
@@ -229,7 +263,7 @@ function CollapsibleSection({
         {hasCheckbox && !checked && (
           <span className="text-[10px] text-gray-400 font-normal ml-1">(базовые значения)</span>
         )}
-        {infoBadgeText && <InfoBadge text={infoBadgeText} />}
+        {infoBadgeNode ?? (infoBadgeText && <InfoBadge text={infoBadgeText} />)}
       </button>
 
       {open && (
@@ -443,41 +477,94 @@ function TractionChart({ step1Result, step2Result }) {
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-function AdvancedTractionCalculator({ onboardingLib, tourRef }) {
+function AdvancedTractionCalculator({ onboardingLib, tourRef, extraActionRef }) {
   const tourInstance = useRef(null)
   const [runTour, setRunTour] = useState(false)
 
+  // ── Beacon mode (Joyride "Справка по полям") ──────────────────────────────
+  const [beaconMode, setBeaconMode] = useState(false)
+
+  // ── Driver highlight refs ─────────────────────────────────────────────────
+  const highlightRef      = useRef(null) // { triggerHighlight, destroyHighlight }
+  const highlightShownRef = useRef(false)
+
+  // ── Intro.js hints instance ───────────────────────────────────────────────
+  const hintsInstanceRef = useRef(null)
+
+  // ── Tippy interactive popover ref (Step 1 calculate button) ──────────────
+  const step1TippyRef = useRef(null)
+
   // ── Onboarding integrations ───────────────────────────────────────────────
+
+  // --- Driver tour + highlight ---
   useEffect(() => {
     if (onboardingLib !== 'driver') return
     const { startTour, destroyTour } = createDriverTour({})
+    const hl = createDriverHighlight()
+    highlightRef.current = hl
+    highlightShownRef.current = false
     if (tourRef) tourRef.current = { start: startTour }
-    return () => { destroyTour(); if (tourRef) tourRef.current = null }
+    if (extraActionRef) extraActionRef.current = { start: () => hl.triggerHighlight() }
+    return () => {
+      destroyTour()
+      hl.destroyHighlight()
+      highlightRef.current = null
+      if (tourRef) tourRef.current = null
+      if (extraActionRef) extraActionRef.current = null
+    }
   }, [onboardingLib]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // --- Intro.js tour + hints ---
   useEffect(() => {
     if (onboardingLib !== 'introjs') return
     const startTour = createIntrojsTour({})
     if (tourRef) tourRef.current = { start: startTour }
-    return () => { if (tourRef) tourRef.current = null }
+
+    // Initialise and show hints automatically
+    // In Intro.js v8 addHints() already shows the bubbles — no showHints() needed
+    const showHints = () => {
+      hintsInstanceRef.current?.removeHints?.()
+      const h = createIntrojsHints()
+      hintsInstanceRef.current = h
+    }
+    showHints()
+    if (extraActionRef) extraActionRef.current = { start: showHints }
+
+    return () => {
+      try { hintsInstanceRef.current?.removeHints?.() } catch (_) { /* ignore */ }
+      hintsInstanceRef.current = null
+      if (tourRef) tourRef.current = null
+      if (extraActionRef) extraActionRef.current = null
+    }
   }, [onboardingLib]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // --- Shepherd tour + instruction tour ---
   useEffect(() => {
     if (onboardingLib !== 'shepherd') return
     const tour = createShepherdTour({})
+    const instrTour = createShepherdInstructionTour({})
     tourInstance.current = tour
     if (tourRef) tourRef.current = { start: () => tour.start() }
+    if (extraActionRef) extraActionRef.current = { start: () => instrTour.start() }
     return () => {
       Shepherd.activeTour?.cancel()
       tourInstance.current = null
       if (tourRef) tourRef.current = null
+      if (extraActionRef) extraActionRef.current = null
     }
   }, [onboardingLib]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // --- Joyride tour + beacon mode ---
   useEffect(() => {
     if (onboardingLib !== 'joyride') return
     if (tourRef) tourRef.current = { start: () => setRunTour(true) }
-    return () => { setRunTour(false); if (tourRef) tourRef.current = null }
+    if (extraActionRef) extraActionRef.current = { start: () => setBeaconMode(m => !m) }
+    return () => {
+      setRunTour(false)
+      setBeaconMode(false)
+      if (tourRef) tourRef.current = null
+      if (extraActionRef) extraActionRef.current = null
+    }
   }, [onboardingLib]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Step 1 state ──────────────────────────────────────────────────────────
@@ -499,6 +586,18 @@ function AdvancedTractionCalculator({ onboardingLib, tourRef }) {
     useEconomics: false, energyCost: '5', maintenanceCost: '50',
   })
   const [step3Result, setStep3Result] = useState(null)
+
+  // ── Driver: auto-highlight Step 2 when Step 1 is first completed ─────────
+  useEffect(() => {
+    if (onboardingLib !== 'driver') return
+    if (!step1Result) return              // Step 1 not yet done
+    if (highlightShownRef.current) return // Already shown once
+    highlightShownRef.current = true
+    const timer = setTimeout(() => {
+      highlightRef.current?.triggerHighlight()
+    }, 800)
+    return () => clearTimeout(timer)
+  }, [step1Result, onboardingLib]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Derived helpers ───────────────────────────────────────────────────────
   function getStatus(n) {
@@ -543,11 +642,25 @@ function AdvancedTractionCalculator({ onboardingLib, tourRef }) {
     }
   }
 
+  // ── fieldTip: renders appropriate tooltip badge based on active lib ────────
+  function fieldTip(defaultText, libText) {
+    if (onboardingLib === 'tippy')   return <TippyBadge content={libText} />
+    if (onboardingLib === 'custom')  return <CustomBadge content={libText} />
+    return <InfoBadge text={defaultText} />
+  }
+
   const currentLoco = LOCOMOTIVES[s1.locomotiveType]
+
+  const joyrideStyles = {
+    options: {
+      primaryColor: '#2563eb', backgroundColor: '#ffffff', textColor: '#374151',
+      arrowColor: '#ffffff', overlayColor: 'rgba(0,0,0,0.65)', zIndex: 10000, width: 380,
+    },
+  }
 
   return (
     <div>
-      {/* ── React Joyride ── */}
+      {/* ── React Joyride (tour) ── */}
       {onboardingLib === 'joyride' && (
         <Joyride
           steps={JOYRIDE_STEPS}
@@ -556,14 +669,77 @@ function AdvancedTractionCalculator({ onboardingLib, tourRef }) {
           spotlightPadding={8}
           disableOverlayClose
           locale={{ back: '← Назад', close: 'Закрыть', last: 'Готово ✓', next: 'Далее →', skip: 'Пропустить' }}
-          styles={{
-            options: {
-              primaryColor: '#2563eb', backgroundColor: '#ffffff', textColor: '#374151',
-              arrowColor: '#ffffff', overlayColor: 'rgba(0,0,0,0.65)', zIndex: 10000, width: 380,
-            },
-          }}
+          styles={joyrideStyles}
           callback={handleJoyrideCallback}
         />
+      )}
+
+      {/* ── React Joyride (beacon mode — Справка по полям) ──
+           One <Joyride> per step → all beacons visible simultaneously.
+           Uncontrolled (no stepIndex) + continuous={false}:
+           clicking a beacon opens its tooltip; closing restores the beacon. */}
+      {onboardingLib === 'joyride' && beaconMode && JOYRIDE_BEACON_STEPS.map((step, i) => (
+        <Joyride
+          key={`beacon-${i}`}
+          steps={[step]}
+          run={beaconMode}
+          continuous={false}
+          disableOverlay={false}
+          showSkipButton={false}
+          spotlightClicks
+          spotlightPadding={6}
+          disableScrolling
+          locale={{ close: 'Закрыть', last: 'Закрыть' }}
+          styles={{
+            ...joyrideStyles,
+            options: {
+              ...joyrideStyles.options,
+              overlayColor: 'rgba(0,0,0,0.15)',
+            },
+          }}
+          callback={() => {}}
+        />
+      ))}
+
+      {/* ── Intro.js: hint notice ── */}
+      {onboardingLib === 'introjs' && (
+        <div className="mb-4 flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 text-xs text-amber-800">
+          <HelpCircle size={13} className="text-amber-500 shrink-0" />
+          <span>Значки <strong>?</strong> — постоянные подсказки (Hints). Нажмите для просмотра.</span>
+        </div>
+      )}
+
+      {/* ── Tippy.js: notice ── */}
+      {onboardingLib === 'tippy' && (
+        <div className="mb-4 flex items-center gap-2 bg-orange-50 border border-orange-200 rounded-xl px-3 py-2 text-xs text-orange-800">
+          <HelpCircle size={13} className="text-orange-500 shrink-0" />
+          <span>Значки <strong className="bg-orange-100 text-orange-600 px-1 rounded">?</strong> рядом с полями — тултипы Tippy.js. Наведите или кликните для справки.</span>
+        </div>
+      )}
+
+      {/* ── Custom (Floating UI): notice ── */}
+      {onboardingLib === 'custom' && (
+        <div className="mb-4 flex items-center gap-2 bg-violet-50 border border-violet-200 rounded-xl px-3 py-2 text-xs text-violet-800">
+          <HelpCircle size={13} className="text-violet-500 shrink-0" />
+          <span>Значки <strong className="bg-violet-100 text-violet-600 px-1 rounded">?</strong> — кастомные тултипы на <code className="font-mono">@floating-ui/react</code>. Наведите для справки.</span>
+        </div>
+      )}
+
+      {/* ── Joyride beacon: close bar ── */}
+      {onboardingLib === 'joyride' && beaconMode && (
+        <div className="mb-4 flex items-center justify-between gap-2 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2 text-xs text-blue-800">
+          <span className="flex items-center gap-1.5">
+            <HelpCircle size={13} className="text-blue-500 shrink-0" />
+            Режим <strong>Справка по полям</strong> — нажмите на пульсирующий маркер у поля для подсказки
+          </span>
+          <button
+            type="button"
+            onClick={() => setBeaconMode(false)}
+            className="shrink-0 px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors"
+          >
+            Закрыть справку
+          </button>
+        </div>
       )}
 
       {/* ── Progress bar ── */}
@@ -584,7 +760,10 @@ function AdvancedTractionCalculator({ onboardingLib, tourRef }) {
             <div data-onboarding-step="1">
               <label htmlFor="step1-locomotive" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Тип локомотива
-                <InfoBadge text="Определяет силу тяги, мощность и собственную массу локомотива." />
+                {fieldTip(
+                  'Определяет силу тяги, мощность и собственную массу локомотива.',
+                  'Серия определяет тяговые характеристики. ВЛ80С — грузовой восьмиосный электровоз переменного тока мощностью 6520 кВт.',
+                )}
               </label>
               <select
                 id="step1-locomotive"
@@ -607,7 +786,10 @@ function AdvancedTractionCalculator({ onboardingLib, tourRef }) {
             <div>
               <label htmlFor="step1-mass" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Масса состава, т
-                <InfoBadge text="Масса вагонов без локомотива. Грузовые поезда: 3 000–6 000 т." />
+                {fieldTip(
+                  'Масса вагонов без локомотива. Грузовые поезда: 3 000–6 000 т.',
+                  'Полная масса вагонов с грузом, без учёта массы локомотива. Типовые значения: 3000–6000 т для грузовых, 1000–1500 т для пассажирских.',
+                )}
               </label>
               <input
                 id="step1-mass"
@@ -620,16 +802,53 @@ function AdvancedTractionCalculator({ onboardingLib, tourRef }) {
               {s1Err.trainMass && <p className="mt-1 text-xs text-red-500">{s1Err.trainMass}</p>}
             </div>
 
-            {/* Calculate button */}
-            <button
-              id="calculate-step1-btn"
-              type="button"
-              onClick={handleCalcStep1}
-              className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2 shadow-sm"
-            >
-              <Calculator size={14} />
-              Рассчитать базовые параметры
-            </button>
+            {/* Calculate button — wrapped in interactive Tippy popover for tippy tab */}
+            {onboardingLib === 'tippy' ? (
+              <Tippy
+                trigger="click"
+                interactive
+                appendTo={() => document.body}
+                maxWidth={280}
+                onCreate={inst => { step1TippyRef.current = inst }}
+                content={
+                  <div className="p-1">
+                    <p className="text-sm font-semibold mb-2">Что происходит при расчёте?</p>
+                    <ul className="text-xs space-y-1 list-disc list-inside text-gray-200">
+                      <li>Вычисляется удельное сопротивление движению по формулам ПТР</li>
+                      <li>Строится зависимость F(v) — сила тяги от скорости</li>
+                      <li>Определяется равновесная скорость в заданных условиях</li>
+                    </ul>
+                    <button
+                      type="button"
+                      onClick={() => step1TippyRef.current?.hide()}
+                      className="mt-3 px-3 py-1 bg-white text-gray-800 text-xs font-medium rounded border border-gray-200 hover:bg-gray-50 transition-colors"
+                    >
+                      Понятно
+                    </button>
+                  </div>
+                }
+              >
+                <button
+                  id="calculate-step1-btn"
+                  type="button"
+                  onClick={handleCalcStep1}
+                  className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2 shadow-sm"
+                >
+                  <Calculator size={14} />
+                  Рассчитать базовые параметры
+                </button>
+              </Tippy>
+            ) : (
+              <button
+                id="calculate-step1-btn"
+                type="button"
+                onClick={handleCalcStep1}
+                className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2 shadow-sm"
+              >
+                <Calculator size={14} />
+                Рассчитать базовые параметры
+              </button>
+            )}
 
             {/* Inline results */}
             {step1Result && (
@@ -653,7 +872,10 @@ function AdvancedTractionCalculator({ onboardingLib, tourRef }) {
             <div>
               <label htmlFor="step2-gradient" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Расчётный уклон, ‰
-                <InfoBadge text='Руководящий подъём в промилле. "+" — подъём, "−" — спуск. Типовые значения: 6–12 ‰.' />
+                {fieldTip(
+                  'Руководящий подъём в промилле. "+" — подъём, "−" — спуск. Типовые значения: 6–12 ‰.',
+                  'Измеряется в промилле (‰): превышение в метрах на 1000 м пути. Подъём — положительное значение, спуск — отрицательное. Нормативный руководящий уклон по ПТР: до 12–15 ‰.',
+                )}
               </label>
               <input
                 id="step2-gradient"
@@ -670,7 +892,10 @@ function AdvancedTractionCalculator({ onboardingLib, tourRef }) {
             <div>
               <label htmlFor="step2-curve" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Минимальный радиус кривых, м
-                <InfoBadge text="Кривые добавляют сопротивление (w_r = 700/R). Оставьте пустым для прямого участка." />
+                {fieldTip(
+                  'Кривые добавляют сопротивление (w_r = 700/R). Оставьте пустым для прямого участка.',
+                  'Радиус горизонтальной кривой в метрах. Влияет на дополнительное сопротивление движению. Минимальный радиус на главных путях — 350 м. При R > 2000 м влиянием можно пренебречь.',
+                )}
               </label>
               <input
                 id="step2-curve"
@@ -687,7 +912,10 @@ function AdvancedTractionCalculator({ onboardingLib, tourRef }) {
             <CollapsibleSection
               id="section-advanced"
               title="Расширенные физические параметры"
-              infoBadgeText="Переопределяют коэффициенты базовой формулы сопротивления движению (ПТР)"
+              infoBadgeNode={fieldTip(
+                'Переопределяют коэффициенты базовой формулы сопротивления движению (ПТР)',
+                'Коэффициенты ПТР: w₀ = a₀ + 3/v + a₂·v². a₀ — коэф. качения (норм. 0.7 Н/кН), a₂ — аэродинамический коэф. (0.0003)',
+              )}
               hasCheckbox
               checkboxLabel="Использовать расширенные параметры"
               checked={s2.useAdvanced}
@@ -698,7 +926,7 @@ function AdvancedTractionCalculator({ onboardingLib, tourRef }) {
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">
                       Нач. коэф. сопр. качению a₀, Н/кН
-                      <InfoBadge text="В формуле w''₀ = a₀ + 3/v + a₂·v². Базовое значение 0.7." />
+                      {fieldTip('В формуле w\'\'₀ = a₀ + 3/v + a₂·v². Базовое значение 0.7.', 'В формуле w\'\'₀ = a₀ + 3/v + a₂·v². a₀ — начальный коэф. сопротивления качению. Базовое значение 0.7 Н/кН.')}
                     </label>
                     <input
                       type="number" min="0" step="0.1"
@@ -711,7 +939,7 @@ function AdvancedTractionCalculator({ onboardingLib, tourRef }) {
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">
                       Коэф. возд. сопротивления a₂
-                      <InfoBadge text="В формуле w''₀ = a₀ + 3/v + a₂·v². Базовое значение 0.0003." />
+                      {fieldTip('В формуле w\'\'₀ = a₀ + 3/v + a₂·v². Базовое значение 0.0003.', 'В формуле w\'\'₀ = a₀ + 3/v + a₂·v². a₂ — аэродинамический коэф. сопротивления. Базовое значение 0.0003.')}
                     </label>
                     <input
                       type="number" min="0" step="0.0001"
@@ -769,7 +997,10 @@ function AdvancedTractionCalculator({ onboardingLib, tourRef }) {
             <CollapsibleSection
               id="section-environmental"
               title="Условия окружающей среды"
-              infoBadgeText="Температура, высота и погода влияют на мощность тягового оборудования"
+              infoBadgeNode={fieldTip(
+                'Температура, высота и погода влияют на мощность тягового оборудования',
+                'Коррекция мощности: температура (−0.5% на °C выше 40°), высота (−3% на 1000 м), снег (−5%), дождь (−3%).',
+              )}
               hasCheckbox
               checkboxLabel="Учитывать условия среды"
               checked={s3.useEnvironmental}
@@ -821,7 +1052,10 @@ function AdvancedTractionCalculator({ onboardingLib, tourRef }) {
             <CollapsibleSection
               id="section-economics"
               title="Экономические параметры"
-              infoBadgeText="Рассчитывает примерную стоимость поездки на 100 км"
+              infoBadgeNode={fieldTip(
+                'Рассчитывает примерную стоимость поездки на 100 км',
+                'Стоимость = энергия (кВт·ч × ₽/кВтч) + обслуживание (100 км × ₽/км). КПД тяги принят 0.85.',
+              )}
               hasCheckbox
               checkboxLabel="Рассчитать стоимость поездки"
               checked={s3.useEconomics}
@@ -916,6 +1150,17 @@ function AdvancedTractionCalculator({ onboardingLib, tourRef }) {
                   </p>
                 </div>
               </div>
+
+              {/* Results tooltip for Tippy/Custom — shown on the summary header */}
+              {(onboardingLib === 'tippy' || onboardingLib === 'custom') && (
+                <div className="px-5 pt-3 flex items-center gap-1.5 text-xs text-gray-500">
+                  <span>Блок результатов</span>
+                  {fieldTip(
+                    'Результаты тягового расчёта.',
+                    'Равновесная скорость — скорость, при которой сила тяги локомотива равна суммарному сопротивлению движению поезда.',
+                  )}
+                </div>
+              )}
 
               {/* Key metrics */}
               <div className="px-5 py-4">
